@@ -215,7 +215,6 @@ export function JourneyMap({
             defaultZoom={sorted.length > 0 ? 6 : 4}
             gestureHandling="cooperative"
             disableDefaultUI
-            zoomControl
             mapId="journey-map"
             className="w-full h-full"
           >
