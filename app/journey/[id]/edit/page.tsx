@@ -36,7 +36,7 @@ export default async function EditJourneyPage({ params }: { params: { id: string
   const [{ data: members }, { data: invites }] = await Promise.all([
     supabase
       .from('journey_members')
-      .select('*, profile:profiles(*)')
+      .select('*, profile:profiles!user_id(*)')
       .eq('journey_id', params.id)
       .order('created_at'),
     supabase

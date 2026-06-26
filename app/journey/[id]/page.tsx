@@ -43,13 +43,13 @@ export default async function JourneyPage({ params }: { params: { id: string } }
     isAdmin
       ? supabase
           .from('journey_members')
-          .select('*, profile:profiles(*)')
+          .select('*, profile:profiles!user_id(*)')
           .eq('journey_id', params.id)
           .order('created_at')
       : Promise.resolve({ data: null }),
     supabase
       .from('journey_members')
-      .select('*, profile:profiles(*)')
+      .select('*, profile:profiles!user_id(*)')
       .eq('journey_id', params.id)
       .eq('role', 'admin')
       .order('created_at'),
