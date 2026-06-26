@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+    --shadow-elevated: 0 4px 12px -2px rgb(0 0 0 / 0.08), 0 2px 6px -2px rgb(0 0 0 / 0.06);
+    --shadow-dropdown: 0 8px 24px -4px rgb(0 0 0 / 0.12), 0 4px 12px -4px rgb(0 0 0 / 0.08);
+    --shadow-soft: 0 24px 48px rgba(1, 45, 29, 0.04);
+  }
+
+  body {
+    @apply bg-surface text-on-surface antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  * {
+    @apply border-outline-variant/30;
+  }
+}
+
+@layer components {
+  /* Input field — minimal bottom-border "journal" style, consistent across all forms */
+  .field {
+    @apply w-full bg-transparent border-0 border-b border-outline-variant/40 rounded-none px-0 py-2.5
+      text-on-surface placeholder:text-outline-variant transition-colors
+      focus:outline-none focus:ring-0 focus:border-primary
+      disabled:text-outline disabled:cursor-not-allowed;
+  }
+
+  /* Card surface */
+  .card {
+    @apply bg-surface-container-low rounded-2xl border border-outline-variant/10 shadow-[var(--shadow-soft)];
+  }
+
+  /* Section within a card */
+  .card-section {
+    @apply p-6 space-y-4;
+  }
+
+  /* Pill button — primary action */
+  .btn-pill-primary {
+    @apply bg-primary text-on-primary font-sans text-label-md py-3.5 px-6 rounded-full
+      transition-all duration-300 shadow-[0_8px_16px_rgba(1,45,29,0.1)]
+      hover:bg-primary-container hover:shadow-[0_12px_24px_rgba(1,45,29,0.15)] hover:-translate-y-0.5
+      disabled:opacity-50 disabled:pointer-events-none disabled:translate-y-0;
+  }
+
+  /* Pill button — secondary / outline action */
+  .btn-pill-secondary {
+    @apply bg-transparent border border-primary text-primary font-sans text-label-md py-3 px-6 rounded-full
+      transition-colors hover:bg-primary hover:text-on-primary
+      disabled:opacity-50 disabled:pointer-events-none;
+  }
+}
+
+/* Diagonal hero clip — editorial hero sections */
+.hero-clip {
+  clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+}
+
+/* Google Maps Places autocomplete dropdown */
+.pac-container {
+  z-index: 9999 !important;
+  border: 1px solid #c1c8c2 !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-dropdown) !important;
+  margin-top: 4px !important;
+  overflow: hidden;
+  font-family: inherit;
+}
+.pac-item {
+  padding: 10px 14px !important;
+  font-size: 13px !important;
+  cursor: pointer;
+  border-top: 1px solid #efeeea !important;
+}
+.pac-item:first-child {
+  border-top: none !important;
+}
+.pac-item:hover,
+.pac-item-selected {
+  background: #f5f3ef !important;
+}
+.pac-item-query {
+  font-size: 13px !important;
+  font-weight: 500;
+  color: #1b1c1a;
+}

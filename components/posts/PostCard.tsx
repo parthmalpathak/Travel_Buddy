@@ -1,0 +1,137 @@
+'use client'
+
+import { useState } from 'react'
+import Image from 'next/image'
+import { MessageCircle, ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
+import { deletePost } from '@/app/journey/[id]/actions'
+import { CommentSection } from './CommentSection'
+import { formatRelative, getInitials } from '@/lib/utils'
+import type { Post, Profile } from '@/lib/types'
+
+interface PostCardProps {
+  post: Post
+  currentUser: Profile
+  canDelete: boolean
+  onDelete: (postId: string) => void
+  onStopClick?: (stopId: string) => void
+}
+
+export function PostCard({ post, currentUser, canDelete, onDelete, onStopClick }: PostCardProps) {
+  const [showComments, setShowComments] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  async function handleDelete() {
+    if (!confirm('Delete this post?')) return
+    setDeleting(true)
+    await deletePost(post.id)
+    onDelete(post.id)
+  }
+
+  const commentCount = post.comment_count ?? post.comments?.length ?? 0
+  const locationLabel = post.stop?.name ?? post.custom_location_name
+
+  return (
+    <article className="flex flex-col gap-4 group">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-3">
+          <div className={`w-2 h-2 rounded-full shrink-0 ${post.type === 'photo' ? 'bg-accent' : 'bg-secondary'}`} />
+          <span className="font-sans text-caption text-secondary uppercase tracking-widest">
+            {formatRelative(post.created_at)}
+            {locationLabel && (
+              <>
+                {' · '}
+                {post.stop ? (
+                  <button
+                    type="button"
+                    onClick={() => onStopClick?.(post.stop!.id)}
+                    disabled={!onStopClick}
+                    className="hover:text-primary transition-colors disabled:hover:text-secondary underline-offset-2 hover:underline"
+                  >
+                    {locationLabel}
+                  </button>
+                ) : (
+                  locationLabel
+                )}
+              </>
+            )}
+          </span>
+        </div>
+
+        {canDelete && (
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="p-1.5 text-outline-variant hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {post.title && (
+        <h2 className="font-serif text-headline-lg text-on-surface">{post.title}</h2>
+      )}
+
+      {post.type === 'blog' && post.content && (
+        <p className="font-sans text-body-lg text-on-surface-variant leading-relaxed whitespace-pre-wrap">
+          {post.content}
+        </p>
+      )}
+
+      {post.type === 'photo' && post.media_url && (
+        <div className="w-full rounded-lg overflow-hidden shadow-sm relative aspect-[4/3] md:aspect-video bg-surface-container-low">
+          <Image
+            src={post.media_url}
+            alt={post.title ?? 'Photo'}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 760px"
+          />
+        </div>
+      )}
+
+      <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center gap-2">
+          <AuthorAvatar profile={post.author} />
+          <p className="font-sans text-caption text-on-surface-variant">{post.author?.full_name ?? 'Unknown'}</p>
+        </div>
+
+        <button
+          onClick={() => setShowComments(v => !v)}
+          className="flex items-center gap-1.5 font-sans text-caption text-on-surface-variant hover:text-primary transition-colors"
+        >
+          <MessageCircle className="w-4 h-4" />
+          {commentCount > 0 ? commentCount : ''}
+          {showComments ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+        </button>
+      </div>
+
+      {showComments && (
+        <CommentSection
+          postId={post.id}
+          initialComments={post.comments ?? []}
+          currentUser={currentUser}
+        />
+      )}
+    </article>
+  )
+}
+
+function AuthorAvatar({ profile }: { profile?: Profile | null }) {
+  if (profile?.avatar_url) {
+    return (
+      <Image
+        src={profile.avatar_url}
+        alt={profile.full_name ?? ''}
+        width={28}
+        height={28}
+        className="rounded-full"
+      />
+    )
+  }
+  return (
+    <div className="w-7 h-7 rounded-full bg-primary-container text-on-primary-container font-bold flex items-center justify-center text-xs">
+      {getInitials(profile?.full_name)}
+    </div>
+  )
+}

@@ -1,2 +1,2 @@
-# Travel_Buddy
-Your personal travel log
+# The Journey
+Road trip journal — log adventures, share with loved ones.
