@@ -13,7 +13,11 @@ export default async function EditJourneyPage({ params }: { params: { id: string
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-  const { data: journey } = await supabase.from('journeys').select('*').eq('id', params.id).single()
+  const { data: journey } = await supabase
+    .from('journeys')
+    .select('*, owner:profiles!owner_id(*)')
+    .eq('id', params.id)
+    .single()
 
   if (!journey) notFound()
 
@@ -67,6 +71,7 @@ export default async function EditJourneyPage({ params }: { params: { id: string
         {isOwner && <ShareLinkPanel journeyId={params.id} shareToken={journey.share_token} />}
         <MembersPanel
           journeyId={params.id}
+          owner={(journey as any).owner}
           members={(members ?? []) as any}
           invites={(invites ?? []) as any}
           isOwner={isOwner}

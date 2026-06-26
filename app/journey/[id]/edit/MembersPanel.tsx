@@ -6,16 +6,17 @@ import { useRouter } from 'next/navigation'
 import { Shield, Eye, Trash2, UserPlus, Mail, Clock, X } from 'lucide-react'
 import { updateMemberRole, removeMember as removeMemberAction, inviteMember, cancelInvite } from './actions'
 import { getInitials } from '@/lib/utils'
-import type { JourneyMember, JourneyInvite } from '@/lib/types'
+import type { JourneyMember, JourneyInvite, Profile } from '@/lib/types'
 
 interface MembersPanelProps {
   journeyId: string
+  owner: Profile
   members: JourneyMember[]
   invites: JourneyInvite[]
   isOwner: boolean
 }
 
-export function MembersPanel({ journeyId, members: initial, invites: initialInvites, isOwner }: MembersPanelProps) {
+export function MembersPanel({ journeyId, owner, members: initial, invites: initialInvites, isOwner }: MembersPanelProps) {
   const router = useRouter()
   const [members, setMembers] = useState(initial)
   const [invites, setInvites] = useState(initialInvites)
@@ -86,6 +87,81 @@ export function MembersPanel({ journeyId, members: initial, invites: initialInvi
         </p>
       </div>
 
+      {/* Current access summary */}
+      <div className="space-y-1.5">
+        <p className="font-sans text-caption font-semibold text-on-surface-variant uppercase tracking-widest">Who has access</p>
+        <ul className="divide-y divide-outline-variant/15">
+          {/* Owner */}
+          <li className="flex items-center gap-3 py-2.5">
+            {owner?.avatar_url ? (
+              <Image src={owner.avatar_url} alt={owner.full_name ?? ''} width={36} height={36} className="rounded-full shrink-0" />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-primary-container text-on-primary-container font-bold flex items-center justify-center text-sm shrink-0">
+                {getInitials(owner?.full_name)}
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-on-surface truncate">{owner?.full_name ?? 'Unknown'}</p>
+              <p className="text-xs text-outline truncate">{owner?.email}</p>
+            </div>
+            <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-primary-container/15 text-primary shrink-0">
+              owner
+            </span>
+          </li>
+          {/* Members */}
+          {members.map(member => (
+            <li key={member.id} className="flex items-center gap-3 py-2.5">
+              {member.profile?.avatar_url ? (
+                <Image src={member.profile.avatar_url} alt={member.profile.full_name ?? ''} width={36} height={36} className="rounded-full shrink-0" />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-primary-container text-on-primary-container font-bold flex items-center justify-center text-sm shrink-0">
+                  {getInitials(member.profile?.full_name)}
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-on-surface truncate">{member.profile?.full_name ?? 'Unknown'}</p>
+                <p className="text-xs text-outline truncate">{member.profile?.email}</p>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                {member.role === 'admin' && !isOwner ? (
+                  <span title="Only the owner can change a co-admin's access" className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-purple-100 text-purple-700">
+                    <Shield className="w-3 h-3" /> co-admin
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => updateRole(member.id, member.role === 'admin' ? 'viewer' : 'admin')}
+                    title={member.role === 'admin' ? 'Demote to viewer' : 'Promote to co-admin'}
+                    className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full transition-colors ${
+                      member.role === 'admin'
+                        ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                        : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
+                    }`}
+                  >
+                    {member.role === 'admin' ? <Shield className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                    {member.role === 'admin' ? 'co-admin' : 'viewer'}
+                  </button>
+                )}
+                {(isOwner || member.role === 'viewer') && (
+                  <button
+                    onClick={() => removeMember(member.id)}
+                    title="Remove from journey"
+                    className="p-1.5 text-outline-variant hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            </li>
+          ))}
+          {members.length === 0 && (
+            <li className="py-3 text-sm text-outline text-center">No members added yet.</li>
+          )}
+        </ul>
+      </div>
+
+      <hr className="border-outline-variant/20" />
+
+      {/* Invite form */}
       <form onSubmit={handleInvite} className="flex flex-col gap-2">
         <div className="relative">
           <Mail className="w-4 h-4 text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2" />
@@ -146,71 +222,6 @@ export function MembersPanel({ journeyId, members: initial, invites: initialInvi
         </div>
       )}
 
-      {members.length === 0 ? (
-        <p className="text-sm text-outline py-4 text-center">
-          No members yet. Invite someone by email or share your journey link.
-        </p>
-      ) : (
-        <ul className="divide-y divide-outline-variant/15">
-          {members.map(member => (
-            <li key={member.id} className="flex items-center gap-3 py-3">
-              {member.profile?.avatar_url ? (
-                <Image
-                  src={member.profile.avatar_url}
-                  alt={member.profile.full_name ?? ''}
-                  width={36}
-                  height={36}
-                  className="rounded-full shrink-0"
-                />
-              ) : (
-                <div className="w-9 h-9 rounded-full bg-primary-container text-on-primary-container font-bold flex items-center justify-center text-sm shrink-0">
-                  {getInitials(member.profile?.full_name)}
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-on-surface truncate">
-                  {member.profile?.full_name ?? 'Unknown'}
-                </p>
-                <p className="text-xs text-outline truncate">{member.profile?.email}</p>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                {member.role === 'admin' && !isOwner ? (
-                  // Co-admins can see another co-admin's role but can't act on it — only the owner can.
-                  <span
-                    title="Only the owner can change a co-admin's access"
-                    className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-purple-100 text-purple-700"
-                  >
-                    <Shield className="w-3 h-3" />
-                    admin
-                  </span>
-                ) : (
-                  <button
-                    onClick={() => updateRole(member.id, member.role === 'admin' ? 'viewer' : 'admin')}
-                    title={member.role === 'admin' ? 'Demote to viewer' : 'Promote to admin'}
-                    className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full transition-colors ${
-                      member.role === 'admin'
-                        ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-                        : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
-                    }`}
-                  >
-                    {member.role === 'admin' ? <Shield className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                    {member.role}
-                  </button>
-                )}
-                {(isOwner || member.role === 'viewer') && (
-                  <button
-                    onClick={() => removeMember(member.id)}
-                    title="Remove from journey"
-                    className="p-1.5 text-outline-variant hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
     </section>
   )
 }
