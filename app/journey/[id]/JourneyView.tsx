@@ -60,23 +60,23 @@ export function JourneyView({ journey, stops, posts, members, coadmins, profile,
           enablePlayback
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/85 via-primary/10 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/50 to-primary/5 pointer-events-none" />
 
         <div className="absolute inset-x-0 bottom-0 z-10 px-margin-mobile pt-margin-mobile pb-12 md:p-margin-desktop flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div className="max-w-2xl">
             <div className="inline-flex px-3 py-1 mb-4 bg-secondary-container text-on-secondary-container font-sans text-caption uppercase rounded-full tracking-wider shadow-sm">
               {stops.length} {stops.length === 1 ? 'Stop' : 'Stops'}
             </div>
-            <h1 className="font-serif text-[26px] leading-[1.2] md:text-display-lg text-on-primary mb-2 line-clamp-2">
+            <h1 className="font-serif text-[22px] leading-[1.2] md:text-headline-lg text-on-primary mb-2 line-clamp-2 [text-shadow:0_2px_12px_rgba(1,45,29,0.5)]">
               {journey.title}
             </h1>
-            <p className="font-sans text-body-lg text-surface-container-low/90 flex items-center gap-1.5 flex-wrap">
+            <p className="font-sans text-body-md text-surface/90 flex items-center gap-1.5 flex-wrap [text-shadow:0_1px_6px_rgba(1,45,29,0.6)]">
               <MapPin className="w-4 h-4 shrink-0" />
               {stops[0]?.name}
               {stops.length > 1 && <> → {stops[stops.length - 1]?.name}</>}
             </p>
             {(journey.start_date || journey.end_date) && (
-              <p className="font-sans text-body-md text-surface-container-low/75 mt-1.5">
+              <p className="font-sans text-body-md text-surface/75 mt-1.5 [text-shadow:0_1px_6px_rgba(1,45,29,0.6)]">
                 {[formatDate(journey.start_date), formatDate(journey.end_date)].filter(Boolean).join(' – ')}
               </p>
             )}
