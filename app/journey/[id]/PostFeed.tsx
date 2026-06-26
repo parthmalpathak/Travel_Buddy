@@ -22,6 +22,10 @@ export function PostFeed({ initialPosts, currentUser, isAdmin, journeyId, select
     setPosts(prev => prev.filter(p => p.id !== postId))
   }
 
+  function handleUpdate(postId: string, fields: { title?: string; content?: string }) {
+    setPosts(prev => prev.map(p => p.id === postId ? { ...p, ...fields } : p))
+  }
+
   const visiblePosts = selectedStop ? posts.filter(p => p.stop_id === selectedStop.id) : posts
 
   if (posts.length === 0) {
@@ -79,6 +83,7 @@ export function PostFeed({ initialPosts, currentUser, isAdmin, journeyId, select
               currentUser={currentUser}
               canDelete={isAdmin || post.author_id === currentUser.id}
               onDelete={handleDelete}
+              onUpdate={handleUpdate}
               onStopClick={onStopTagClick}
             />
           </div>
