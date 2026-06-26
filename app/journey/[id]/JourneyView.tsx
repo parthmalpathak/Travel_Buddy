@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { Plus, Settings, Share2, MapPin, Shield, Eye } from 'lucide-react'
+import { Plus, Settings, Share2, MapPin } from 'lucide-react'
 import { JourneyMap } from '@/components/map/JourneyMap'
 import { UserAvatar } from '@/components/layout/Header'
 import { PostFeed } from './PostFeed'
@@ -15,13 +15,14 @@ interface JourneyViewProps {
   stops: Stop[]
   posts: Post[]
   members: JourneyMember[]
+  coadmins: JourneyMember[]
   profile: Profile
   isOwner: boolean
   isAdmin: boolean
   shareUrl: string
 }
 
-export function JourneyView({ journey, stops, posts, members, profile, isOwner, isAdmin, shareUrl }: JourneyViewProps) {
+export function JourneyView({ journey, stops, posts, members, coadmins, profile, isOwner, isAdmin, shareUrl }: JourneyViewProps) {
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null)
   const [distanceMeters, setDistanceMeters] = useState<number | null>(null)
 
@@ -136,12 +137,30 @@ export function JourneyView({ journey, stops, posts, members, profile, isOwner, 
 
           {/* Right Column: Sidebar */}
           <aside className="lg:col-span-4 flex flex-col gap-8 mt-stack-md lg:mt-0">
-            {/* Owner */}
+            {/* Journey Crew — owner + co-admins, visible to all */}
             {journey.owner && (
-              <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/10 flex flex-col items-center text-center">
-                <UserAvatar profile={journey.owner} size={64} />
-                <h4 className="font-serif text-headline-md text-on-surface mt-3">{journey.owner.full_name}</h4>
-                <p className="font-sans text-caption text-on-surface-variant mt-1">Journey Owner</p>
+              <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/10">
+                <h4 className="font-serif text-headline-md text-on-surface mb-4">Journey Crew</h4>
+                <ul className="flex flex-col gap-3">
+                  <li className="flex items-center gap-2.5">
+                    <UserAvatar profile={journey.owner} size={36} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-sans text-sm font-medium text-on-surface truncate">{journey.owner.full_name}</p>
+                      <p className="font-sans text-xs text-on-surface-variant">Journey Owner</p>
+                    </div>
+                  </li>
+                  {coadmins.map(member => (
+                    <li key={member.id} className="flex items-center gap-2.5">
+                      <UserAvatar profile={member.profile!} size={36} />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-sans text-sm font-medium text-on-surface truncate">
+                          {member.profile?.full_name ?? 'Unknown'}
+                        </p>
+                        <p className="font-sans text-xs text-on-surface-variant">Co-admin</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
 
@@ -172,37 +191,6 @@ export function JourneyView({ journey, stops, posts, members, profile, isOwner, 
               </ul>
             </div>
 
-            {/* Members — who has access (owner + admin only) */}
-            {isAdmin && (
-              <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/10">
-                <h4 className="font-serif text-headline-md text-on-surface mb-4">Members</h4>
-                <ul className="flex flex-col gap-3">
-                  <li className="flex items-center gap-2.5">
-                    <UserAvatar profile={journey.owner!} size={32} />
-                    <span className="flex-1 min-w-0 font-sans text-sm text-on-surface truncate">
-                      {journey.owner?.full_name}
-                    </span>
-                    <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-primary-container/15 text-primary shrink-0">
-                      owner
-                    </span>
-                  </li>
-                  {members.map(member => (
-                    <li key={member.id} className="flex items-center gap-2.5">
-                      <UserAvatar profile={member.profile!} size={32} />
-                      <span className="flex-1 min-w-0 font-sans text-sm text-on-surface truncate">
-                        {member.profile?.full_name ?? 'Unknown'}
-                      </span>
-                      <span className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full shrink-0 ${
-                        member.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-surface-container text-on-surface-variant'
-                      }`}>
-                        {member.role === 'admin' ? <Shield className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                        {member.role === 'admin' ? 'co-admin' : 'viewer'}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
 
             {/* Stops list — interactive */}
             <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/10">

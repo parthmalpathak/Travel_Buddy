@@ -39,13 +39,21 @@ export default async function JourneyPage({ params }: { params: { id: string } }
     .eq('journey_id', params.id)
     .order('created_at', { ascending: false })
 
-  const { data: members } = isAdmin
-    ? await supabase
-        .from('journey_members')
-        .select('*, profile:profiles(*)')
-        .eq('journey_id', params.id)
-        .order('created_at')
-    : { data: null }
+  const [{ data: members }, { data: coadmins }] = await Promise.all([
+    isAdmin
+      ? supabase
+          .from('journey_members')
+          .select('*, profile:profiles(*)')
+          .eq('journey_id', params.id)
+          .order('created_at')
+      : Promise.resolve({ data: null }),
+    supabase
+      .from('journey_members')
+      .select('*, profile:profiles(*)')
+      .eq('journey_id', params.id)
+      .eq('role', 'admin')
+      .order('created_at'),
+  ])
 
   const stops = [...(journey.stops ?? [])].sort((a, b) => a.order_index - b.order_index)
   const shareUrl = getShareUrl(journey.share_token)
@@ -58,6 +66,7 @@ export default async function JourneyPage({ params }: { params: { id: string } }
         stops={stops}
         posts={(posts ?? []) as any}
         members={(members ?? []) as any}
+        coadmins={(coadmins ?? []) as any}
         profile={profile!}
         isOwner={isOwner}
         isAdmin={isAdmin}
