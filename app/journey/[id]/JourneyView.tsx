@@ -75,8 +75,7 @@ export function JourneyView({ journey, stops, posts, members, profile, isOwner, 
               {stops.length > 1 && <> → {stops[stops.length - 1]?.name}</>}
             </p>
             {(journey.start_date || journey.end_date) && (
-              <p className="font-sans text-body-md text-surface-container-low/75 mt-1.5 flex items-center gap-1.5">
-                <span aria-hidden>·</span>
+              <p className="font-sans text-body-md text-surface-container-low/75 mt-1.5">
                 {[formatDate(journey.start_date), formatDate(journey.end_date)].filter(Boolean).join(' – ')}
               </p>
             )}
