@@ -66,7 +66,7 @@ export function JourneyView({ journey, stops, posts, members, profile, isOwner, 
             <div className="inline-flex px-3 py-1 mb-4 bg-secondary-container text-on-secondary-container font-sans text-caption uppercase rounded-full tracking-wider shadow-sm">
               {stops.length} {stops.length === 1 ? 'Stop' : 'Stops'}
             </div>
-            <h1 className="font-serif text-display-lg-mobile md:text-display-lg text-on-primary mb-2">
+            <h1 className="font-serif text-[26px] leading-[1.2] md:text-display-lg text-on-primary mb-2 line-clamp-2">
               {journey.title}
             </h1>
             <p className="font-sans text-body-lg text-surface-container-low/90 flex items-center gap-1.5 flex-wrap">

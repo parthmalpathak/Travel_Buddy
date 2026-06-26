@@ -86,33 +86,35 @@ export function MembersPanel({ journeyId, members: initial, invites: initialInvi
         </p>
       </div>
 
-      <form onSubmit={handleInvite} className="flex gap-2">
-        <div className="flex-1 relative">
+      <form onSubmit={handleInvite} className="flex flex-col gap-2">
+        <div className="relative">
           <Mail className="w-4 h-4 text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
             placeholder="friend@example.com"
-            className="field pl-9"
+            className="field pl-9 w-full"
           />
         </div>
-        <select
-          value={role}
-          onChange={e => setRole(e.target.value as 'admin' | 'viewer')}
-          className="field bg-surface-container-lowest w-32 shrink-0"
-        >
-          <option value="admin">Co-admin</option>
-          <option value="viewer">Viewer</option>
-        </select>
-        <button
-          type="submit"
-          disabled={loading || !email.trim()}
-          className="flex items-center gap-1.5 bg-primary hover:bg-primary-container disabled:opacity-50 text-on-primary text-sm font-semibold px-4 py-2.5 rounded-full transition-colors shrink-0"
-        >
-          <UserPlus className="w-4 h-4" />
-          Invite
-        </button>
+        <div className="flex gap-2">
+          <select
+            value={role}
+            onChange={e => setRole(e.target.value as 'admin' | 'viewer')}
+            className="field bg-surface-container-lowest flex-1"
+          >
+            <option value="admin">Co-admin</option>
+            <option value="viewer">Viewer</option>
+          </select>
+          <button
+            type="submit"
+            disabled={loading || !email.trim()}
+            className="flex items-center gap-1.5 bg-primary hover:bg-primary-container disabled:opacity-50 text-on-primary text-sm font-semibold px-4 py-2.5 rounded-full transition-colors shrink-0"
+          >
+            <UserPlus className="w-4 h-4" />
+            Invite
+          </button>
+        </div>
       </form>
 
       {message && <p className="text-sm text-primary bg-primary-container/10 border border-primary/20 rounded-xl px-4 py-2.5">{message}</p>}

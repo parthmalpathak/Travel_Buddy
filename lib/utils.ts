@@ -8,7 +8,10 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatDate(date: string | null | undefined) {
   if (!date) return ''
-  return format(new Date(date), 'MMM d, yyyy')
+  // Parse YYYY-MM-DD as local time — new Date('YYYY-MM-DD') treats it as UTC
+  // which shifts the displayed date back one day in negative-offset timezones.
+  const [year, month, day] = date.split('-').map(Number)
+  return format(new Date(year, month - 1, day), 'MMM d, yyyy')
 }
 
 export function formatRelative(date: string) {
