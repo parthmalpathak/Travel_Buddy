@@ -22,6 +22,7 @@ export function LoginButton({ next }: { next?: string }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code: code.trim() }),
+      credentials: 'same-origin', // required for the browser to store the Set-Cookie response
     })
 
     if (!res.ok) {

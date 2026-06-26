@@ -9,8 +9,8 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     // Verify the access code cookie set by /api/verify-access-code before allowing sign-in
-    const accessCookie = request.cookies.get('_journey_access')?.value
-    if (!accessCookie || accessCookie !== process.env.ACCESS_CODE) {
+    const accessCookie = request.cookies.get('_journey_access')?.value?.trim()
+    if (!accessCookie || accessCookie !== process.env.ACCESS_CODE?.trim()) {
       return NextResponse.redirect(`${origin}/login?error=access_denied`)
     }
 
