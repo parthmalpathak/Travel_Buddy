@@ -76,19 +76,19 @@ export default async function DashboardPage() {
 
         {/* Stats row */}
         {allJourneys.length > 0 && (
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-8">
             {[
               { label: 'Journeys', value: allJourneys.length, Icon: Route, color: 'text-primary', bg: 'bg-primary-container/10' },
               { label: 'Photos', value: totalPhotos, Icon: Camera, color: 'text-on-accent', bg: 'bg-accent/15' },
               { label: 'Blog Posts', value: totalBlogs, Icon: FileText, color: 'text-emerald-600', bg: 'bg-emerald-50' },
             ].map(({ label, value, Icon, color, bg }) => (
-              <div key={label} className="card px-6 py-5 flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
-                  <Icon className={`w-5 h-5 ${color}`} />
+              <div key={label} className="card px-3 py-4 sm:px-6 sm:py-5 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${color}`} />
                 </div>
                 <div>
-                  <p className={`font-serif text-2xl leading-none ${color}`}>{value}</p>
-                  <p className="font-sans text-xs text-on-surface-variant mt-1 font-medium">{label}</p>
+                  <p className={`font-serif text-xl sm:text-2xl leading-none ${color}`}>{value}</p>
+                  <p className="font-sans text-xs text-on-surface-variant mt-1 font-medium leading-tight">{label}</p>
                 </div>
               </div>
             ))}

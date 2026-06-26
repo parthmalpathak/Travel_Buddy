@@ -214,7 +214,7 @@ export function JourneyMap({
             defaultCenter={center}
             defaultZoom={sorted.length > 0 ? 6 : 4}
             gestureHandling="cooperative"
-            fullscreenControl={false}
+            fullscreenControl={true}
             mapId="journey-map"
             className="w-full h-full"
           >
