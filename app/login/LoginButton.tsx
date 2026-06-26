@@ -5,10 +5,31 @@ import { createClient } from '@/lib/supabase/client'
 
 export function LoginButton({ next }: { next?: string }) {
   const [loading, setLoading] = useState(false)
+  const [code, setCode] = useState('')
+  const [error, setError] = useState('')
   const supabase = createClient()
 
   async function signInWithGoogle() {
+    if (!code.trim()) {
+      setError('Please enter the access code.')
+      return
+    }
+
     setLoading(true)
+    setError('')
+
+    const res = await fetch('/api/verify-access-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: code.trim() }),
+    })
+
+    if (!res.ok) {
+      setError('Incorrect access code.')
+      setLoading(false)
+      return
+    }
+
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -18,21 +39,38 @@ export function LoginButton({ next }: { next?: string }) {
   }
 
   return (
-    <button
-      onClick={signInWithGoogle}
-      disabled={loading}
-      className="w-full flex items-center justify-center gap-3 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface font-sans text-label-md font-semibold py-4 px-6 rounded-full transition-colors duration-300 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group mb-2"
-    >
-      {!loading && <GoogleIcon />}
-      {loading ? (
-        <span className="flex items-center gap-2">
-          <span className="w-4 h-4 border-2 border-outline-variant border-t-primary rounded-full animate-spin" />
-          Redirecting...
-        </span>
-      ) : (
-        'Continue with Google'
-      )}
-    </button>
+    <div className="space-y-3">
+      <div className="text-left">
+        <input
+          type="password"
+          value={code}
+          onChange={e => { setCode(e.target.value); setError('') }}
+          onKeyDown={e => e.key === 'Enter' && signInWithGoogle()}
+          placeholder="Access code"
+          autoComplete="off"
+          className="field w-full"
+        />
+        {error && (
+          <p className="mt-1.5 font-sans text-caption text-error">{error}</p>
+        )}
+      </div>
+
+      <button
+        onClick={signInWithGoogle}
+        disabled={loading}
+        className="w-full flex items-center justify-center gap-3 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface font-sans text-label-md font-semibold py-4 px-6 rounded-full transition-colors duration-300 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group"
+      >
+        {!loading && <GoogleIcon />}
+        {loading ? (
+          <span className="flex items-center gap-2">
+            <span className="w-4 h-4 border-2 border-outline-variant border-t-primary rounded-full animate-spin" />
+            Redirecting...
+          </span>
+        ) : (
+          'Continue with Google'
+        )}
+      </button>
+    </div>
   )
 }
 

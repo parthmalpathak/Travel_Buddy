@@ -20,6 +20,12 @@ export async function createJourney(input: CreateJourneyInput): Promise<{ journe
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const allowedCreators = (process.env.JOURNEY_CREATOR_EMAILS ?? '')
+    .split(',').map(e => e.trim()).filter(Boolean)
+  if (allowedCreators.length > 0 && !allowedCreators.includes(user.email ?? '')) {
+    return { error: 'You are not authorised to create journeys.' }
+  }
+
   // The "user can create journey" INSERT policy on `journeys` is confirmed broken at the
   // database level (likely an orphaned RESTRICTIVE policy from earlier debugging) — a real,
   // valid JWT for this exact user still gets 42501 on INSERT even with a `with check (true)`

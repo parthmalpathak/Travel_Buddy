@@ -8,7 +8,15 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get('next') ?? '/dashboard'
 
   if (code) {
+    // Verify the access code cookie set by /api/verify-access-code before allowing sign-in
+    const accessCookie = request.cookies.get('_journey_access')?.value
+    if (!accessCookie || accessCookie !== process.env.ACCESS_CODE) {
+      return NextResponse.redirect(`${origin}/login?error=access_denied`)
+    }
+
     const response = NextResponse.redirect(`${origin}${next}`)
+    // Clear the short-lived access cookie now that OAuth is complete
+    response.cookies.delete('_journey_access')
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
