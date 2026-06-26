@@ -30,3 +30,4 @@ CLAUDE.md
 
 # design reference export — large binary, not needed for the app to run
 stitch_sophisticated_journey_interface.zip
+.env*
