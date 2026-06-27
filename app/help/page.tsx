@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, MapPin, Camera, Users, Share2, Play, Mail, Shield } from 'lucide-react'
+import { ArrowLeft, MapPin, Camera, Users, Share2, Play, Mail, Shield, FlaskConical } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/Header'
 
@@ -29,6 +29,17 @@ export default async function HelpPage() {
           </h1>
           <p className="font-sans text-body-md text-on-surface-variant mt-1.5">Everything you need to know to get the most out of The Journey.</p>
         </div>
+
+        <section className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl p-5">
+          <FlaskConical className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="font-sans text-sm font-semibold text-amber-800">Beta — Journey creation is currently disabled</p>
+            <p className="font-sans text-sm text-amber-700 leading-relaxed">
+              The Journey is in beta testing. Creating new journeys is currently available to the developer only. If you'd like access or have questions, reach out at{' '}
+              <a href="mailto:parthmalpathak@gmail.com" className="underline underline-offset-2 hover:text-amber-900 transition-colors">parthmalpathak@gmail.com</a>.
+            </p>
+          </div>
+        </section>
 
         <Section icon={MapPin} title="Planning a journey">
           <p>From your dashboard, click <strong>New Journey</strong>. Give it a title, optional description and dates, then search for places to build your route — the first stop you add is the start, the last is the destination.</p>

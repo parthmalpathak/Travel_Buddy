@@ -31,7 +31,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${jakartaSans.variable} ${libreCaslon.variable}`}>
-      <body>{children}</body>
+      <body className="flex flex-col min-h-screen">
+        <div className="flex-1">{children}</div>
+        <footer className="py-4 text-center font-sans text-xs text-on-surface-variant/50">
+          &copy; {new Date().getFullYear()} Parth Malpathak
+        </footer>
+      </body>
     </html>
   )
 }
