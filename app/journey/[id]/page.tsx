@@ -41,7 +41,7 @@ export default async function JourneyPage({ params }: { params: { id: string } }
   const adminSupabase = createAdminClient()
   const { data: posts, error: postsError } = await adminSupabase
     .from('posts')
-    .select('*, author:profiles(*), stop:stops(*), comments(*, author:profiles(*)), post_likes(user_id)')
+    .select('*, author:profiles!author_id(*), stop:stops(*), comments(*, author:profiles!author_id(*)), post_likes(user_id)')
     .eq('journey_id', params.id)
     .order('created_at', { ascending: false })
   if (postsError) console.error('[posts query error]', postsError)
