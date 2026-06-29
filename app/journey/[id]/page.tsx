@@ -1,8 +1,11 @@
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { Header } from '@/components/layout/Header'
 import { JourneyView } from './JourneyView'
 import { getShareUrl } from '@/lib/utils'
+
+export const dynamic = 'force-dynamic'
 
 export default async function JourneyPage({ params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -33,11 +36,15 @@ export default async function JourneyPage({ params }: { params: { id: string } }
 
   const isAdmin = isOwner || role === 'admin'
 
-  const { data: posts } = await supabase
+  // Use admin client for posts to avoid JWT/RLS PostgREST issues (same pattern as journeys INSERT).
+  // Auth is already verified above: user exists, isOwner/role is checked before this.
+  const adminSupabase = createAdminClient()
+  const { data: posts, error: postsError } = await adminSupabase
     .from('posts')
     .select('*, author:profiles(*), stop:stops(*), comments(*, author:profiles(*)), post_likes(user_id)')
     .eq('journey_id', params.id)
     .order('created_at', { ascending: false })
+  if (postsError) console.error('[posts query error]', postsError)
 
   const [{ data: members }, { data: coadmins }] = await Promise.all([
     isAdmin
