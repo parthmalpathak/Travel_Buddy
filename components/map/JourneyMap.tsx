@@ -268,16 +268,19 @@ export function JourneyMap({
           )}
 
           {isPlaying && playbackStop && (
-            <div className="absolute top-4 inset-x-0 z-10 flex justify-center px-24 pointer-events-none">
-              <div className="bg-surface-container-lowest rounded-2xl shadow-lg overflow-hidden flex items-center max-w-md pointer-events-auto">
+            <div className="absolute top-4 inset-x-0 z-10 flex justify-center px-4 pointer-events-none">
+              <div className="relative bg-surface-container-lowest rounded-2xl shadow-lg overflow-hidden pointer-events-auto w-56">
                 {stopPhotos?.[playbackStop.id] && (
-                  <img src={stopPhotos[playbackStop.id]} alt={playbackStop.name} className="w-16 h-16 object-cover shrink-0" />
+                  <>
+                    <img src={stopPhotos[playbackStop.id]} alt="" className="absolute inset-0 w-full h-full object-cover" aria-hidden />
+                    <div className="absolute inset-0 bg-surface-container-lowest/80" />
+                  </>
                 )}
-                <div className="px-5 py-3 text-center flex-1 min-w-0">
+                <div className="relative px-4 py-3 text-center">
                   <p className="text-[10px] font-semibold text-primary uppercase tracking-widest mb-0.5">
                     Stop {playbackIndex + 1} of {sorted.length}
                   </p>
-                  <p className="text-base font-serif italic text-on-surface truncate">{playbackStop.name}</p>
+                  <p className="text-sm font-serif italic text-on-surface truncate">{playbackStop.name}</p>
                 </div>
               </div>
             </div>

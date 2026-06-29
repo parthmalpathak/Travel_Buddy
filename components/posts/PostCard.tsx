@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { MessageCircle, ChevronDown, ChevronUp, Trash2, Pencil, Check, X } from 'lucide-react'
-import { deletePost, updatePost } from '@/app/journey/[id]/actions'
+import { MessageCircle, ChevronDown, ChevronUp, Trash2, Pencil, Check, X, Heart } from 'lucide-react'
+import { deletePost, updatePost, toggleLike } from '@/app/journey/[id]/actions'
 import { CommentSection } from './CommentSection'
 import { formatRelative, getInitials } from '@/lib/utils'
 import type { Post, Profile } from '@/lib/types'
@@ -21,6 +21,9 @@ export function PostCard({ post, currentUser, canDelete, onDelete, onUpdate, onS
   const [showComments, setShowComments] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [editing, setEditing] = useState(false)
+  const [liked, setLiked] = useState(() => post.post_likes?.some(l => l.user_id === currentUser.id) ?? false)
+  const [likeCount, setLikeCount] = useState(() => post.post_likes?.length ?? 0)
+  const [liking, setLiking] = useState(false)
   const [saving, setSaving] = useState(false)
   const [editTitle, setEditTitle] = useState(post.title ?? '')
   const [editContent, setEditContent] = useState(post.content ?? '')
@@ -56,6 +59,19 @@ export function PostCard({ post, currentUser, canDelete, onDelete, onUpdate, onS
     onUpdate(post.id, fields)
     setEditing(false)
     setSaving(false)
+  }
+
+  async function handleLike() {
+    if (liking) return
+    setLiking(true)
+    setLiked(v => !v)
+    setLikeCount(v => liked ? v - 1 : v + 1)
+    const result = await toggleLike(post.id)
+    if (result.error) {
+      setLiked(v => !v)
+      setLikeCount(v => liked ? v + 1 : v - 1)
+    }
+    setLiking(false)
   }
 
   const commentCount = post.comment_count ?? post.comments?.length ?? 0
@@ -193,14 +209,24 @@ export function PostCard({ post, currentUser, canDelete, onDelete, onUpdate, onS
           <p className="font-sans text-caption text-on-surface-variant">{post.author?.full_name ?? 'Unknown'}</p>
         </div>
 
-        <button
-          onClick={() => setShowComments(v => !v)}
-          className="flex items-center gap-1.5 font-sans text-caption text-on-surface-variant hover:text-primary transition-colors"
-        >
-          <MessageCircle className="w-4 h-4" />
-          {commentCount > 0 ? commentCount : ''}
-          {showComments ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleLike}
+            disabled={liking}
+            className={`flex items-center gap-1 font-sans text-caption transition-colors ${liked ? 'text-red-500' : 'text-on-surface-variant hover:text-red-400'}`}
+          >
+            <Heart className={`w-4 h-4 transition-all ${liked ? 'fill-current scale-110' : ''}`} />
+            {likeCount > 0 && <span>{likeCount}</span>}
+          </button>
+          <button
+            onClick={() => setShowComments(v => !v)}
+            className="flex items-center gap-1.5 font-sans text-caption text-on-surface-variant hover:text-primary transition-colors"
+          >
+            <MessageCircle className="w-4 h-4" />
+            {commentCount > 0 ? commentCount : ''}
+            {showComments ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+        </div>
       </div>
 
       {showComments && (

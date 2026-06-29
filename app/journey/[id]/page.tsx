@@ -35,7 +35,7 @@ export default async function JourneyPage({ params }: { params: { id: string } }
 
   const { data: posts } = await supabase
     .from('posts')
-    .select('*, author:profiles(*), stop:stops(*), comments(*, author:profiles(*))')
+    .select('*, author:profiles(*), stop:stops(*), comments(*, author:profiles(*)), post_likes(user_id)')
     .eq('journey_id', params.id)
     .order('created_at', { ascending: false })
 

@@ -64,6 +64,7 @@ export interface Post {
   stop?: Stop
   comments?: Comment[]
   comment_count?: number
+  post_likes?: { user_id: string }[]
 }
 
 export interface JourneyInvite {

@@ -13,6 +13,27 @@ export async function deletePost(postId: string): Promise<{ error?: string }> {
   return {}
 }
 
+export async function toggleLike(postId: string): Promise<{ liked: boolean; error?: string }> {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: existing } = await supabase
+    .from('post_likes')
+    .select('post_id')
+    .eq('post_id', postId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (existing) {
+    await supabase.from('post_likes').delete().eq('post_id', postId).eq('user_id', user.id)
+    return { liked: false }
+  } else {
+    await supabase.from('post_likes').insert({ post_id: postId, user_id: user.id })
+    return { liked: true }
+  }
+}
+
 export async function updatePost(
   postId: string,
   fields: { title?: string; content?: string }
